@@ -16,10 +16,10 @@ enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
 
 typedef struct {
   struct {
-    uint32_t _32;
-    uint16_t _16;
-    uint8_t _8[2];
-  } gpr[8];
+    uint32_t _32;//32bit(eax)
+    uint16_t _16;//16bit(ax)
+    uint8_t _8[2];//8bit(AH/AL)
+  } gpr[8];//一共8个
 
   /* Do NOT change the order of the GPRs' definitions. */
 
