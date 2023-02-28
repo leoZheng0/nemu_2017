@@ -92,8 +92,8 @@ static inline void parse_args(int argc, char *argv[]) {
   int o;
   while ( (o = getopt(argc, argv, "-bl:")) != -1) {
     switch (o) {
-      case 'b': is_batch_mode = true; break;
-      case 'l': log_file = optarg; break;
+      case 'b': is_batch_mode = true; break;//如果输入参数是b就启动batch_mode
+      case 'l': log_file = optarg; break;//指定文件输出路径,其中这个optarg表示getopt解析出来的文件路径,也就是我们要把输出log重定向至这里面
       case 1:
                 if (img_file != NULL) Log("too much argument '%s', ignored", optarg);
                 else img_file = optarg;
