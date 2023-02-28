@@ -18,9 +18,9 @@ char* rl_gets() {
     line_read = NULL;
   }
 
-  line_read = readline("(nemu) ");
+  line_read = readline("(nemu) ");//等待指令
 
-  if (line_read && *line_read) {
+  if (line_read && *line_read) {//如果用户输入了什么,就将指令放到"history"链表的末尾
     add_history(line_read);
   }
 
@@ -83,7 +83,7 @@ void ui_mainloop(int is_batch_mode) {
   }
 
   while (1) {
-    char *str = rl_gets();
+    char *str = rl_gets();//这一步是让用户输入命令并保存到history中
     char *str_end = str + strlen(str);
 
     /* extract the first token as the command */
@@ -105,8 +105,8 @@ void ui_mainloop(int is_batch_mode) {
 
     int i;
     for (i = 0; i < NR_CMD; i ++) {
-      if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }
+      if (strcmp(cmd, cmd_table[i].name) == 0) {//这里开始比较cmd_table中的预设命令和我们输入的命令了
+        if (cmd_table[i].handler(args) < 0) { return; }//如果匹配,就会调用那个命令对应的handler函数
         break;
       }
     }
