@@ -1,7 +1,7 @@
 #include "nemu.h"
 #include <unistd.h>
 
-#define ENTRY_START 0x100000
+#define ENTRY_START 0x100000//这是初始程序起始加载位置
 
 void init_difftest();
 void init_regex();
