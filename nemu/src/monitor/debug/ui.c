@@ -63,7 +63,7 @@ static int cmd_info(char *args){
   if(arg == NULL){
     
   }
-  print("args:%s , arg:%s",args,arg);
+  printf("args:%s , arg:%s",args,arg);
   return 0;
 }
 
