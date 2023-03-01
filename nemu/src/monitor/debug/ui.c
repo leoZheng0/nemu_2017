@@ -7,7 +7,10 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#define TEST_VALID(x) if(x){printf("Invalid args!\n");return 0;}
+
 void cpu_exec(uint64_t);
+
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 char* rl_gets() {
@@ -58,12 +61,25 @@ static int cmd_si(char *args){
 
 //info
 static int cmd_info(char *args){
-  //print reg info
+
   char *arg = strtok(NULL, " ");
-  if(arg == NULL){
-    
+  TEST_VALID(arg==NULL);
+
+  switch(*arg){
+    case 'r':{
+      //print reg info
+      int i;
+      for (i = R_EAX; i <= R_EDI; i ++) {
+        printf("%s\t : 0x%08x\n",regsl[i],reg_l(i));
+      }
+      printf("eip\t : 0x%08x\n",cpu.eip);
+      break;
+    }
+    default:{
+      printf("Unknown arg '%s'\n", arg);
+      break;
+    }
   }
-  printf("args:%s , arg:%s",args,arg);
   return 0;
 }
 
@@ -124,7 +140,7 @@ void ui_mainloop(int is_batch_mode) {
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;
+    char *args = cmd + strlen(cmd) + 1;//这个args就是除了第一个字符串之后的剩余字符串首指针(不去除首空格)
     if (args >= str_end) {
       args = NULL;
     }
