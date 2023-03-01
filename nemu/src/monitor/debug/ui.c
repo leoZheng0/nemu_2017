@@ -46,9 +46,9 @@ static int cmd_si(char *args){
     step = 1;
   }
   else{
-    sscanf(args,"%d",step);
+    sscanf(args,"%d",&step);
     if(step<=0){
-      printf("you can't exec %d step(s), require >= 1 step(s)!",&step);
+      printf("you can't exec %d step(s), require >= 1 step(s)!",step);
       return 0;
     }
   }
