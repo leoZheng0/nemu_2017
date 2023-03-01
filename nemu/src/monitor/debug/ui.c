@@ -48,7 +48,7 @@ static int cmd_si(char *args){
   else{
     sscanf(arg,"%d",&step);
     if(step<=0){
-      printf("you can't exec %d step(s), require >= 1 step(s)!",step);
+      printf("you can't exec %d step(s), require >= 1 step(s)!\n",step);
       return 0;
     }
   }
@@ -58,7 +58,13 @@ static int cmd_si(char *args){
 
 //info
 static int cmd_info(char *args){
-  
+  //print reg info
+  char *arg = strtok(NULL, " ");
+  if(arg == NULL){
+    
+  }
+  print("args:%s , arg:%s",args,arg);
+  return 0;
 }
 
 static struct {
@@ -69,7 +75,8 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "Step x (default 1)",cmd_si}
+  { "si", "Step x (default 1)",cmd_si},
+  { "info","r - reg info , w - watchpoint info",cmd_info}
 
   /* TODO: Add more commands */
 
