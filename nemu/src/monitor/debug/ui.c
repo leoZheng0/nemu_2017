@@ -40,7 +40,20 @@ static int cmd_help(char *args);
 
 //单步执行
 static int cmd_si(char *args){
-  printf("helloworld");
+  char *arg = strtok(NULL, " ");
+  int step;
+  if(args == NULL){
+    step = 1;
+  }
+  else{
+    sscanf(args,"%d",step);
+    if(step<=0){
+      printf("you can't exec %d step(s), require >= 1 step(s)!",&step);
+      return 0;
+    }
+  }
+  cpu_exec(step);
+  return 0;
 }
 
 
