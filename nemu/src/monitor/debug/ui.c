@@ -99,8 +99,9 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "Step x (default 1)",cmd_si},
-  { "info","r - reg info , w - watchpoint info",cmd_info}
+  { "si", "[si x] Step x (default 1)",cmd_si},
+  { "info","[info r/w] r - reg info , w - watchpoint info",cmd_info},
+  { "x", "[x N expr] read N*4 Bytes at expr",cmd_x}
 
   /* TODO: Add more commands */
 
