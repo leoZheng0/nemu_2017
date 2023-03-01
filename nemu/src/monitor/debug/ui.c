@@ -70,9 +70,13 @@ static int cmd_info(char *args){
       //print reg info
       int i;
       for (i = R_EAX; i <= R_EDI; i ++) {
-        printf("%s\t : 0x%08x\n",regsl[i],reg_l(i));
+        printf("$%s\t:0x%08x\n",regsl[i],reg_l(i));
       }
-      printf("eip\t : 0x%08x\n",cpu.eip);
+      printf("$eip\t:0x%08x\n",cpu.eip);
+      break;
+    }
+    case 'w':{
+      //print watchpoint info
       break;
     }
     default:{
@@ -83,6 +87,10 @@ static int cmd_info(char *args){
   return 0;
 }
 
+//scan mem
+static int cmd_x(char *args){
+  printf("%08x",vaddr_read(0x100000,4));
+}
 static struct {
   char *name;
   char *description;
