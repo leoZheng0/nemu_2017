@@ -97,12 +97,21 @@ static bool make_token(char *e) {
 
         switch (rules[i].token_type) {
           case TK_NOTYPE: break;
-          //这个地方要将大写字母变成小写,方便后面处理
+          
           default: {
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str,substr_start,substr_len);
             strcat(tokens[nr_token].str,"\0");
-            printf("%s",tokens[nr_token].str);
+            
+            //这个地方要将大写字母变成小写,方便后面处理
+            for (int t = 0; t <= strlen(tokens[nr_token].str); t++) {
+							int x = tokens[nr_token].str[t];
+							if (x >= 'A' && x <= 'Z') 
+                x += ('a' - 'A');
+							tokens[nr_token].str[t] = (char)x;
+						}
+
+            nr_token++;
           }
         }
 
