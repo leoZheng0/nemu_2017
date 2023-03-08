@@ -127,7 +127,7 @@ static bool make_token(char *e) {
 
   return true;
 }
-eval(p, q) {
+uint32_t eval(p, q) {
   if (p > q) {
     /* Bad expression */
   }
