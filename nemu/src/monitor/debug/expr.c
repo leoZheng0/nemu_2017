@@ -127,36 +127,56 @@ static bool make_token(char *e) {
 
   return true;
 }
-// uint32_t eval(int p, int q) {
-//   if (p > q) {
-//     /* Bad expression */
-//   }
-//   else if (p == q) {
-//     /* Single token.
-//      * For now this token should be a number.
-//      * Return the value of the number.
-//      */
-//   }
-//   else if (check_parentheses(p, q) == true) {
-//     /* The expression is surrounded by a matched pair of parentheses.
-//      * If that is the case, just throw away the parentheses.
-//      */
-//     return eval(p + 1, q - 1);
-//   }
-//   else {
-//     // op = the position of dominant operator in the token expression;
-//     // val1 = eval(p, op - 1);
-//     // val2 = eval(op + 1, q);
 
-//     // switch (op_type) {
-//     //   case '+': return val1 + val2;
-//     //   case '-': /* ... */
-//     //   case '*': /* ... */
-//     //   case '/': /* ... */
-//     //   default: assert(0);
-//     //}
-//   }
-// }
+//验证外括号是否匹配
+bool check_parentheses(p, q){
+  //检测有没有外括号
+  if(tokens[p].type!='(' || tokens[q].type!=')'){
+    return false;
+  }
+  else{
+    int vir_stack = 0;//虚拟栈大小
+    for(int i=p;i<=q;i++){
+      if(tokens[i].type=='(') vir_stack++;
+      if(tokens[i].type==')') vir_stack--;
+      if(vir_stack<0) return false;
+    }
+
+    if(vir_stack!=0) return false;
+    else return true;
+  }
+}
+
+uint32_t eval(int p, int q) {
+  if (p > q) {
+    /* Bad expression */
+  }
+  else if (p == q) {
+    /* Single token.
+     * For now this token should be a number.
+     * Return the value of the number.
+     */
+  }
+  else if (check_parentheses(p, q) == true) {
+    /* The expression is surrounded by a matched pair of parentheses.
+     * If that is the case, just throw away the parentheses.
+     */
+    return eval(p + 1, q - 1);
+  }
+  else {
+    // op = the position of dominant operator in the token expression;
+    // val1 = eval(p, op - 1);
+    // val2 = eval(op + 1, q);
+
+    // switch (op_type) {
+    //   case '+': return val1 + val2;
+    //   case '-': /* ... */
+    //   case '*': /* ... */
+    //   case '/': /* ... */
+    //   default: assert(0);
+    //}
+  }
+}
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
