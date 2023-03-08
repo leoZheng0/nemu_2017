@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_NOT, TK_AND, TK_OR, TK_REG, TK_HEX, TK_NUM
 
   /* TODO: Add more token types */
 
@@ -23,16 +23,32 @@ static struct rule {
    */
 
   {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ}         // equal
+  {"\\+", '+'},         // plus 这个地方首先\\会被c语言转义成一个\,然后变成\+,会被regex转义成正常的+字符
+  {"-", '-'},         // minus
+  {"\\*", '*'},         // multi
+  {"/", '/'},         // divide
+
+  {"==", TK_EQ},         // equal
+  {"!=", TK_NEQ},
+	{"!", TK_NOT},
+	{"&&", TK_AND},
+	{"\\|\\|", TK_OR},
+
+  {"\\$[a-zA-z]+", TK_REG},		// register
+	{"\\b0[xX][0-9a-fA-F]+\\b", TK_HEX}, // hex
+	{"\\b[0-9]+\\b", TK_NUM},				// number
+
+  {"\\(", '('},         // left bracket
+  {"\\)", ')'},         // right bracket
 };
 
-#define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
+#define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )//上面那个rule有多少条目
 
 static regex_t re[NR_REGEX];
 
 /* Rules are used for many times.
  * Therefore we compile them only once before any usage.
+ * 就是把rules数组中的各个规则通过regcomp函数“实现”出来，并存到re数组里面
  */
 void init_regex() {
   int i;
@@ -53,13 +69,13 @@ typedef struct token {
   char str[32];
 } Token;
 
-Token tokens[32];
-int nr_token;
+Token tokens[32];//按序识别的token
+int nr_token;//记录一共识别了多少个token了
 
 static bool make_token(char *e) {
   int position = 0;
   int i;
-  regmatch_t pmatch;
+  regmatch_t pmatch;//承载匹配的字符串
 
   nr_token = 0;
 
@@ -96,7 +112,7 @@ static bool make_token(char *e) {
   return true;
 }
 
-uint32_t expr(char *e, bool *success) {
+int32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
     return 0;
