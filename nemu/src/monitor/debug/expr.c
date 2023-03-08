@@ -96,13 +96,13 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          TK_NOTYPE: break;
+          case TK_NOTYPE: break;
           //这个地方要将大写字母变成小写,方便后面处理
           default: {
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str,substr_start,substr_len);
             strcat(tokens[nr_token].str,"\0");
-            printf(tokens[nr_token].str);
+            printf("%s",tokens[nr_token].str);
           }
         }
 
