@@ -93,14 +93,14 @@ static int cmd_x(char *args){
 
   char *arg = strtok(NULL, " ");
   TEST_VALID(arg==NULL);
-  char *N = arg;
+  int N = atoi(arg);
 
   arg = strtok(NULL, " ");
   TEST_VALID(arg==NULL);
   char *expr_str = arg;
 
-  //这里expr应该返回一个int32类型的数值
-  bool* success = false;
+  //这里expr应该返回一个uint32类型的数值,因为地址一定为正
+  bool* success;
   expr(expr_str,success);
 }
 static struct {
