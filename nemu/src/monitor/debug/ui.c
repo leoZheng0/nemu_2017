@@ -90,10 +90,18 @@ static int cmd_info(char *args){
 //scan mem
 static int cmd_x(char *args){
   printf("%08x",vaddr_read(0x100000,4));
+
   char *arg = strtok(NULL, " ");
   TEST_VALID(arg==NULL);
+  char *N = arg;
+
+  arg = strtok(NULL, " ");
+  TEST_VALID(arg==NULL);
+  char *expr_str = arg;
 
   //这里expr应该返回一个int32类型的数值
+  bool* success = false;
+  expr(expr_str,success);
 }
 static struct {
   char *name;
