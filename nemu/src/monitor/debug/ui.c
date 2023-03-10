@@ -100,7 +100,13 @@ static int cmd_x(char *args){
 
   //这里expr应该返回一个uint32类型的数值,因为地址一定为正
   bool success;
-  expr(expr_str,&success);
+  uint32_t base = expr(expr_str,&success);
+  TEST_VALID(!success);
+  	int i;
+	for (i = 0; i < N; i++) {
+		printf("0x%08x\t0x%08x\n", base + i * 4, vaddr_read(base + i * 4, 4));
+	}
+	return 0;
 
 }
 static struct {
