@@ -94,11 +94,7 @@ static int cmd_x(char *args){
   TEST_VALID(arg==NULL);
   int N = atoi(arg);
 
-  char* expr_str = "";
-  while( (arg = strtok(NULL, " "))!=NULL){
-    strcat(expr_str,arg);
-  }
-  strcat(expr_str,"\0");
+  char* expr_str = arg + strlen(arg) + 1;
   TEST_VALID(expr_str==NULL);
 
   //这里expr应该返回一个uint32类型的数值,因为地址一定为正
