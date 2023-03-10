@@ -167,9 +167,30 @@ uint32_t eval(int p, int q) {
   }
   else if (p == q) {
     /* Single token.
-     * For now this token should be a number.
+     * For now this token should be a number（hex，dec，reg）.
      * Return the value of the number.
      */
+    switch (tokens[p].type){
+      int num = 0;
+      case TK_NUM:{
+        sscanf(tokens[p].str, "%d", &num);
+        break;
+      }
+      case TK_HEX:{
+        sscanf(tokens[p].str, "%x", &num);
+        break;
+      }
+      case TK_REG:{
+        int reg_length = strlen(tokens[p].str);//看一下是哪个寄存器长度
+        char* reg_name = (tokens[p].str)+1;
+        printf("%s",reg_name);
+        if(reg_length==3){
+
+        }
+
+        break;
+      }
+    }
   }
   else if (check_parentheses(p, q) == true) {
     /* The expression is surrounded by a matched pair of parentheses.
