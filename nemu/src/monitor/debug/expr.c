@@ -174,23 +174,55 @@ uint32_t eval(int p, int q) {
       int num = 0;
       case TK_NUM:{
         sscanf(tokens[p].str, "%d", &num);
-        break;
+        return num;
       }
       case TK_HEX:{
         sscanf(tokens[p].str, "%x", &num);
-        break;
+        return num;
       }
       case TK_REG:{
         int reg_length = strlen(tokens[p].str);//看一下是哪个寄存器长度
         char* reg_name = (tokens[p].str)+1;
         printf("%s",reg_name);
+        //32bit reg
         if(reg_length==3){
-
+          for(int i=R_EAX;i<R_EDI;i++){
+            if(strcmp(reg_name,regsl[i])==0){
+              return reg_l(i);
+            }
+          }
+          if(strcmp(reg_name,"eip")==0){
+            return cpu.eip;
+          }
+          bad_expression = true;
+          return 0;
         }
 
-        break;
+        //16bit
+        else if(reg_length==2){
+          for(int i=R_AX;i<R_DI;i++){
+            if(strcmp(reg_name,regsw[i])==0){
+              return reg_w(i);
+            }
+          }
+
+          for(int i=R_AL;i<R_BH;i++){
+            if(strcmp(reg_name,regsb[i])==0){
+              return reg_b(i);
+            }
+          }
+
+          bad_expression = true;
+          return 0;
+        }
+      }
+      default:{
+        bad_expression=true;
+        return 0;
       }
     }
+    bad_expression=true;
+    return 0;
   }
   else if (check_parentheses(p, q) == true) {
     /* The expression is surrounded by a matched pair of parentheses.
