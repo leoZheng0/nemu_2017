@@ -170,7 +170,7 @@ static bool make_token(char *e) {
 
 //验证外括号是否匹配
 bool check_parentheses(int p, int q){
-  printf("%d\n",tokens[p].type);
+  // printf("%d\n",tokens[p].type);
   //检测有没有外括号
   if(tokens[p].type!='(' || tokens[q].type!=')'){
     return false;
@@ -356,10 +356,11 @@ uint32_t expr(char *e, bool *success) {
   uint32_t res = eval(0,nr_token-1);
 
   if(bad_expression==false){//判断一下是不是bad表达式
-      *success = true;
+      //*success = true;
   }
   else{
       // *success = false;
   }
+  printf("%d\n",*success);
   return res;
 }
