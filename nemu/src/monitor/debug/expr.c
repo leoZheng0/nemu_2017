@@ -62,7 +62,7 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
+  {"\b \b", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus 这个地方首先\\会被c语言转义成一个\,然后变成\+,会被regex转义成正常的+字符
   {"-", '-'},         // minus
   {"\\*", '*'},         // multi
