@@ -181,8 +181,8 @@ uint32_t eval(int p, int q) {
         return num;
       }
       case TK_REG:{
-        int reg_length = strlen(tokens[p].str);//看一下是哪个寄存器长度
         char* reg_name = (tokens[p].str)+1;
+        int reg_length = strlen(reg_name);//看一下是哪个寄存器长度
         //32bit reg
         if(reg_length==3){
           for(int i=R_EAX;i<R_EDI;i++){
