@@ -102,8 +102,7 @@ static int cmd_x(char *args){
   bool success;
   uint32_t base = expr(expr_str,&success);
   TEST_VALID(!success);
-  	int i;
-	for (i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++) {
 		printf("0x%08x\t0x%08x\n", base + i * 4, vaddr_read(base + i * 4, 4));
 	}
 	return 0;
