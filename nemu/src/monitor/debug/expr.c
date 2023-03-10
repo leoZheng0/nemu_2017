@@ -71,7 +71,7 @@ typedef struct token {
 
 Token tokens[32];//按序识别的token
 int nr_token;//记录一共识别了多少个token了
-
+bool bad_expression = false;//代表这个表达式有问题
 static bool make_token(char *e) {
   int position = 0;
   int i;
@@ -139,17 +139,31 @@ bool check_parentheses(p, q){
     for(int i=p;i<=q;i++){
       if(tokens[i].type=='(') vir_stack++;
       if(tokens[i].type==')') vir_stack--;
-      if(vir_stack<0) return false;
+      if(vir_stack<0) {
+        bad_expression = true;
+        return false;
+      }
     }
 
-    if(vir_stack!=0) return false;
+    if(vir_stack!=0){
+      bad_expression = true;
+      return false;
+    }
     else return true;
   }
 }
 
+
+
 uint32_t eval(int p, int q) {
+  if(bad_expression){//错误的表达式就直接退出
+    assert(0);
+  }
+
   if (p > q) {
     /* Bad expression */
+    bad_expression = true;
+    return -1;
   }
   else if (p == q) {
     /* Single token.
@@ -186,5 +200,5 @@ uint32_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
 
-  return 0;
+  return eval(0,nr_token-1);
 }

@@ -89,7 +89,7 @@ static int cmd_info(char *args){
 
 //scan mem
 static int cmd_x(char *args){
-  printf("%08x",vaddr_read(0x100000,4));
+  printf("%08x\n",vaddr_read(0x100000,4));
 
   char *arg = strtok(NULL, " ");
   TEST_VALID(arg==NULL);
