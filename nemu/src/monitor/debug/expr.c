@@ -7,16 +7,21 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_NOT, TK_AND, TK_OR, TK_REG, TK_HEX, TK_NUM
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_NOT, TK_AND, TK_OR, TK_REG, TK_HEX, TK_NUM, MINUS, POINTER
 
   /* TODO: Add more token types */
 
 };
 
+static struct Priority{
+  int pri;//优先计算级,越低越优先计算
+}priority[] = {
+  1,7,7,2,11,12,1,1,1,2,2
+};
+
 static struct rule {
   char *regex;
   int token_type;
-  int priority;//优先级
 } rules[] = {
 
   /* TODO: Add more rules.
@@ -32,8 +37,8 @@ static struct rule {
   {"==", TK_EQ},         // equal
   {"!=", TK_NEQ},
 	{"!", TK_NOT},
-	{"&&", TK_AND},
-	{"\\|\\|", TK_OR},
+	{"&&", TK_AND,},
+	{"\\|\\|", TK_OR,},
 
   {"\\$[a-zA-z]+", TK_REG},		// register
 	{"\\b0[xX][0-9a-fA-F]+\\b", TK_HEX}, // hex
