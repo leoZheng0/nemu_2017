@@ -7,17 +7,51 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_NOT, TK_AND, TK_OR, TK_REG, TK_HEX, TK_NUM, MINUS, POINTER
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_NOT, TK_AND, TK_OR, TK_REG, TK_HEX, TK_NUM, TK_MINUS, TK_POINTER
 
   /* TODO: Add more token types */
 
 };
 
-static struct Priority{
-  int pri;//优先计算级,越低越优先计算
-}priority[] = {
-  1,7,7,2,11,12,1,1,1,2,2
-};
+//根据type获得优先级
+int get_priority(int token_type){
+  switch (token_type){
+    case '+': { // pri = 4
+			return 4;
+		}
+		case '-': { // pri = 4
+			return 4;
+		}
+		case '*': { // pri = 3
+			return 3;
+		}
+		case '/': { // pri = 3
+			return 3;
+		}
+		case TK_NOT: { // pri = 2
+			return 2;
+		}
+		case TK_EQ: { // pri = 5
+			return 5;
+		}
+		case TK_NEQ: { // pri = 5
+			return 5;
+		}
+		case TK_AND: { // pri = 6
+			return 6;
+		}
+		case TK_OR: { // pri = 7
+			return 7;
+		}
+		case TK_MINUS: { // pri = 2
+			return 2;
+		}
+		case TK_POINTER: { // pri = 2
+			return 2;
+		}
+		default: return 0;
+  }
+}
 
 static struct rule {
   char *regex;
@@ -161,7 +195,24 @@ bool check_parentheses(int p, int q){
 
 //获得根节点(算符)的位置
 int dominant_op(int p, int q) {
+  if(bad_expression==true)
+    return 0;
+  int pos=p,pri=0,cur_pri = 0;//优先级越低越先计算,反之越高越后计算,我们的目标就是找出"最后计算的符号",也就是找到pri最大的那个符号的位置
+  int bracket = 0;
+  for(int i=p;i<=q;i++){
+    //跳过括号内容
+    if (tokens[i].type == '(') bracket++;
+		if (tokens[i].type == ')') bracket--;
+		if (bracket != 0) continue;
 
+    cur_pri = get_priority(tokens[i].type);
+    if(cur_pri>=pri){
+      pos = i;
+      pri = cur_pri;
+    }
+  }
+  printf("%d",pos);
+  return pos;
 }
 
 
