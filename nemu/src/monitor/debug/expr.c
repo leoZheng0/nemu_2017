@@ -309,7 +309,7 @@ uint32_t eval(int p, int q) {
     if (p == op_pos || tokens[op_pos].type == TK_NOT || tokens[op_pos].type == TK_MINUS || tokens[op_pos].type == TK_POINTER) {
 			uint32_t r_ans = eval(op_pos + 1, q);
 			switch (tokens[op_pos].type) {
-        case TK_POINTER: return swaddr_read(r_ans, 4);
+        case TK_POINTER: return vaddr_read(r_ans, 4);
         case TK_NOT: return !r_ans;
         case TK_MINUS: return -r_ans;
         default: {bad_expression = false; return 0;}
