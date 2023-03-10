@@ -222,7 +222,7 @@ int dominant_op(int p, int q) {
     }
   }
 
-  printf("%d",pos);
+  printf("%d\n",pos);
   return pos;
 }
 
