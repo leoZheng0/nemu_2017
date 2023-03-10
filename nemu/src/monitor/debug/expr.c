@@ -356,7 +356,7 @@ uint32_t expr(char *e, bool *success) {
   uint32_t res = eval(0,nr_token-1);
 
   if(bad_expression==false){//判断一下是不是bad表达式
-      // *success = true;
+      *success = true;
   }
   else{
       // *success = false;
