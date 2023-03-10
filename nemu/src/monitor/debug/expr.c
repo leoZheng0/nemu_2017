@@ -170,8 +170,8 @@ uint32_t eval(int p, int q) {
      * For now this token should be a number（hex，dec，reg）.
      * Return the value of the number.
      */
+    int num = 0;
     switch (tokens[p].type){
-      int num = 0;
       case TK_NUM:{
         sscanf(tokens[p].str, "%d", &num);
         return num;
