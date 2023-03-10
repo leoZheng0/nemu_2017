@@ -62,7 +62,7 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
+  {" +",	TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus 这个地方首先\\会被c语言转义成一个\,然后变成\+,会被regex转义成正常的+字符
   {"-", '-'},         // minus
   {"\\*", '*'},         // multi
@@ -113,60 +113,59 @@ Token tokens[32];//按序识别的token
 int nr_token;//记录一共识别了多少个token了
 bool bad_expression = false;//代表这个表达式有问题
 static bool make_token(char *e) {
-	int position = 0;
-	int i;
-	regmatch_t pmatch;
+  int position = 0;
+  int i;
+  regmatch_t pmatch;//承载匹配的字符串
 
-	nr_token = 0;
+  nr_token = 0;
 
-	while (e[position] != '\0') {
-		/* Try all rules one by one. */
-		for (i = 0; i < NR_REGEX; i ++) {
-			if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
-				char *substr_start = e + position;
-				int substr_len = pmatch.rm_eo;
+  while (e[position] != '\0') {
+    /* Try all rules one by one. */
+    for (i = 0; i < NR_REGEX; i ++) {
+      if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
+        char *substr_start = e + position;
+        int substr_len = pmatch.rm_eo;
 
-//				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
+        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+            i, rules[i].regex, position, substr_len, substr_len, substr_start);
+        position += substr_len;
 
-				position += substr_len;
-				/* TODO: Now a new token is recognized with rules[i]. Add codes
-				 * to record the token in the array `tokens'. For certain types
-				 * of tokens, some extra actions should be performed.
-				 */
+        /* TODO: Now a new token is recognized with rules[i]. Add codes
+         * to record the token in the array `tokens'. For certain types
+         * of tokens, some extra actions should be performed.
+         */
 
-				switch (rules[i].token_type) {
-				case TK_NOTYPE: break;
-				default: {
-					tokens[nr_token].type = rules[i].token_type;
-					if (rules[i].token_type == TK_REG) { //Register
-						char* reg_start = e + (position - substr_len) + 1;
-						strncpy(tokens[nr_token].str, reg_start, substr_len - 1);
-						int t;
-						for (t = 0; t <= strlen(tokens[nr_token].str); t++) { // tolower
+        switch (rules[i].token_type) {
+          case TK_NOTYPE: break;
+          
+          default: {
+            tokens[nr_token].type = rules[i].token_type;
+            strncpy(tokens[nr_token].str,substr_start,substr_len);
+            strcat(tokens[nr_token].str,"\0");
+            
+            //这个地方要将大写字母变成小写,方便后面处理
+            for (int t = 0; t <= strlen(tokens[nr_token].str); t++) {
 							int x = tokens[nr_token].str[t];
-							if (x >= 'A' && x <= 'Z') x += ('a' - 'A');
+							if (x >= 'A' && x <= 'Z') 
+                x += ('a' - 'A');
 							tokens[nr_token].str[t] = (char)x;
 						}
-					} else
-						strncpy(tokens[nr_token].str, substr_start, substr_len);
 
-					tokens[nr_token].str[substr_len] = '\0';
+            nr_token++;
+          }
+        }
 
-					//						printf("%s\n", tokens[nr_token].str);
-					nr_token ++;
-				}
-				}
+        break;
+      }
+    }
 
-				break;
-			}
-		}
+    if (i == NR_REGEX) {
+      printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
+      return false;
+    }
+  }
 
-		if (i == NR_REGEX) {
-			printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
-			return false;
-		}
-	}
-	return true;
+  return true;
 }
 
 //验证外括号是否匹配
