@@ -292,7 +292,7 @@ uint32_t eval(int p, int q) {
     return eval(p + 1, q - 1);
   }
   else {
-    // op = the position of dominant operator in the token expression;
+    int op_pos = dominant_op(p,q);
     // val1 = eval(p, op - 1);
     // val2 = eval(op + 1, q);
 
