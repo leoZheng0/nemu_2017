@@ -111,7 +111,7 @@ typedef struct token {
 
 Token tokens[32];//按序识别的token
 int nr_token;//记录一共识别了多少个token了
-bool bad_expression = false;//代表这个表达式有问题
+bool *bad_expression = false;//代表这个表达式有问题
 static bool make_token(char *e) {
   int position = 0;
   int i;
@@ -181,13 +181,13 @@ bool check_parentheses(int p, int q){
       if(tokens[i].type=='(') vir_stack++;
       if(tokens[i].type==')') vir_stack--;
       if(vir_stack<0) {
-        bad_expression = true;
+        *bad_expression = true;
         return false;
       }
     }
 
     if(vir_stack!=0){
-      bad_expression = true;
+      *bad_expression = true;
       return false;
     }
     else return true;
@@ -196,7 +196,7 @@ bool check_parentheses(int p, int q){
 
 //获得根节点(算符)的位置
 int dominant_op(int p, int q) {
-  if(bad_expression==true)
+  if(*bad_expression==true)
     return 0;
   int pos=p,pri=0,cur_pri = 0;//优先级越低越先计算,反之越高越后计算,我们的目标就是找出"最后计算的符号",也就是找到pri最大的那个符号的位置
   int bracket = 0;
@@ -229,14 +229,14 @@ int dominant_op(int p, int q) {
 
 
 uint32_t eval(int p, int q) {
-  if(bad_expression){//错误的表达式就直接退出
+  if(*bad_expression){//错误的表达式就直接退出
     printf("bad expression!");
     assert(0);
   }
 
   if (p > q) {
     /* Bad expression */
-    bad_expression = true;
+    *bad_expression = true;
     return -1;
   }
   else if (p == q) {
@@ -267,7 +267,7 @@ uint32_t eval(int p, int q) {
           if(strcmp(reg_name,"eip")==0){
             return cpu.eip;
           }
-          bad_expression = true;
+          *bad_expression = true;
           return 0;
         }
 
@@ -285,16 +285,16 @@ uint32_t eval(int p, int q) {
             }
           }
 
-          bad_expression = true;
+          *bad_expression = true;
           return 0;
         }
       }
       default:{
-        bad_expression=true;
+        *bad_expression=true;
         return 0;
       }
     }
-    bad_expression=true;
+    *bad_expression=true;
     return 0;
   }
   else if (check_parentheses(p, q) == true) {
@@ -320,7 +320,7 @@ uint32_t eval(int p, int q) {
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
-    bad_expression = false;
+    *bad_expression = false;
     return 0;
   }
 
@@ -333,7 +333,7 @@ uint32_t expr(char *e, bool *success) {
     if(cur_type==')') bracket--;
     if(bracket<0){
       *success = false;
-      bad_expression = true;
+      *bad_expression = true;
       return 0;
     }
 
@@ -350,12 +350,12 @@ uint32_t expr(char *e, bool *success) {
   }
   if (bracket != 0) {
 		*success = false;
-    bad_expression=true;
+    *bad_expression=true;
 		return 0;
 	}
   uint32_t res = eval(0,nr_token-1);
 
-  if(bad_expression==false){//判断一下是不是bad表达式
+  if(*bad_expression==false){//判断一下是不是bad表达式
       *success = true;
   }
   else{
