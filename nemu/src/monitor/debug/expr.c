@@ -233,7 +233,7 @@ uint32_t eval(int p, int q) {
     printf("bad expression!");
     assert(0);
   }
-
+  uint32_t ans = 0;
   if (p > q) {
     /* Bad expression */
     bad_expression = true;
@@ -244,7 +244,7 @@ uint32_t eval(int p, int q) {
      * For now this token should be a number（hex，dec，reg）.
      * Return the value of the number.
      */
-    int num = 0;
+    uint32_t num = 0;
     switch (tokens[p].type){
       case TK_NUM:{
         sscanf(tokens[p].str, "%d", &num);
@@ -305,17 +305,32 @@ uint32_t eval(int p, int q) {
   }
   else {
     int op_pos = dominant_op(p,q);
-    // val1 = eval(p, op - 1);
-    // val2 = eval(op + 1, q);
+    //进行前缀处理
+    if (p == op_pos || tokens[op_pos].type == TK_NOT || tokens[op_pos].type == TK_MINUS || tokens[op_pos].type == TK_POINTER) {
+			uint32_t r_ans = eval(op_pos + 1, q);
+			switch (tokens[op_pos].type) {
+        case TK_POINTER: return swaddr_read(r_ans, 4);
+        case TK_NOT: return !r_ans;
+        case TK_MINUS: return -r_ans;
+        default: {bad_expression = false; return 0;}
+			}
+		}
 
-    // switch (op_type) {
-    //   case '+': return val1 + val2;
-    //   case '-': /* ... */
-    //   case '*': /* ... */
-    //   case '/': /* ... */
-    //   default: assert(0);
-    //}
+    uint32_t l_ans = eval(p,op_pos-1);
+    uint32_t r_ans = eval(op_pos+1,q);
+		switch (tokens[op_pos].type) {
+		case '+': ans = l_ans + r_ans; break;
+		case '-': ans = l_ans - r_ans; break;
+		case '*': ans = l_ans * r_ans; break;
+		case '/': if (r_ans == 0) {bad_expression = false; return 0;} else ans = l_ans / r_ans; break;
+		case TK_EQ : ans = l_ans == r_ans; break;
+		case TK_NEQ: ans = l_ans != r_ans; break;
+		case TK_AND: ans = l_ans && r_ans; break;
+		case TK_OR : ans = l_ans && r_ans; break;
+		default: {bad_expression = false; return 0;}
+		}
   }
+  return ans;
 }
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -361,6 +376,5 @@ uint32_t expr(char *e, bool *success) {
   // else{
   //     // *success = false;
   // }
-  printf("%d\n",*success);
   return res;
 }
