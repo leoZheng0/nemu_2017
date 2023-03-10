@@ -170,7 +170,7 @@ static bool make_token(char *e) {
 
 //验证外括号是否匹配
 bool check_parentheses(int p, int q){
-  printf("%d",tokens[p].type);
+  printf("%d\n",tokens[p].type);
   //检测有没有外括号
   if(tokens[p].type!='(' || tokens[q].type!=')'){
     return false;
