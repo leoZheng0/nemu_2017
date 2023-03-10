@@ -211,6 +211,17 @@ int dominant_op(int p, int q) {
       pri = cur_pri;
     }
   }
+
+  //处理--1,!!0这种形式的数据
+  if(pri==2){
+    for(int i=pos-1;i>=p;i--){
+      cur_pri = get_priority(tokens[i].type);
+      if(cur_pri==pri){
+        pos = i;
+      }
+    }
+  }
+
   printf("%d",pos);
   return pos;
 }
