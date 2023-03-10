@@ -327,32 +327,32 @@ uint32_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   //这个地方需要识别  负号和减号 , 称号和指针符号
   int bracket = 0;
-  // for(int i=0;i<nr_token;i++){
-  //   int cur_type = tokens[i].type;
-  //   if(cur_type=='(') bracket++;
-  //   if(cur_type==')') bracket--;
-  //   if(bracket<0){
-  //     *success = false;
-  //     bad_expression = true;
-  //     return 0;
-  //   }
+  for(int i=0;i<nr_token;i++){
+    int cur_type = tokens[i].type;
+    if(cur_type=='(') bracket++;
+    if(cur_type==')') bracket--;
+    if(bracket<0){
+      *success = false;
+      bad_expression = true;
+      return 0;
+    }
 
-  //   //形如 a . b(.代表符号),当且仅当a不存在,或a不为任何单一结构(reg,hex,num,右括号)时, .处出现的符号为前缀符号(即minus或pointer)
+    //形如 a . b(.代表符号),当且仅当a不存在,或a不为任何单一结构(reg,hex,num,右括号)时, .处出现的符号为前缀符号(即minus或pointer)
 
-  //   if (tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != ')' && 
-  //   tokens[i - 1].type != TK_NUM && tokens[i - 1].type != TK_HEX  && tokens[i - 1].type !=  TK_REG))) {
-	// 		tokens[i].type = TK_MINUS;
-	// 	}
-	// 	if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != ')' && 
-  //   tokens[i - 1].type != TK_NUM && tokens[i - 1].type != TK_HEX  && tokens[i - 1].type !=  TK_REG))) {
-	// 		tokens[i].type = TK_POINTER;
-	// 	}
-  // }
-  // if (bracket != 0) {
-	// 	*success = false;
-  //   bad_expression=true;
-	// 	return 0;
-	// }
+    if (tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != ')' && 
+    tokens[i - 1].type != TK_NUM && tokens[i - 1].type != TK_HEX  && tokens[i - 1].type !=  TK_REG))) {
+			tokens[i].type = TK_MINUS;
+		}
+		if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != ')' && 
+    tokens[i - 1].type != TK_NUM && tokens[i - 1].type != TK_HEX  && tokens[i - 1].type !=  TK_REG))) {
+			tokens[i].type = TK_POINTER;
+		}
+  }
+  if (bracket != 0) {
+		*success = false;
+    bad_expression=true;
+		return 0;
+	}
   uint32_t res = eval(0,nr_token-1);
 
   // if(bad_expression==false){//判断一下是不是bad表达式
