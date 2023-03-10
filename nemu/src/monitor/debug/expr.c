@@ -16,6 +16,7 @@ enum {
 static struct rule {
   char *regex;
   int token_type;
+  int priority;//优先级
 } rules[] = {
 
   /* TODO: Add more rules.
@@ -153,10 +154,15 @@ bool check_parentheses(int p, int q){
   }
 }
 
+//获得根节点(算符)的位置
+int dominant_op(int p, int q) {
+
+}
 
 
 uint32_t eval(int p, int q) {
   if(bad_expression){//错误的表达式就直接退出
+    printf("bad expression!");
     assert(0);
   }
 
