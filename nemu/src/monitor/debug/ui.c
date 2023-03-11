@@ -151,6 +151,10 @@ static int cmd_d(char* args){
 	return 0;
 }
 
+//计算表达式
+static int cmd_p(char* args){
+  
+}
 
 static struct {
   char *name;
@@ -162,7 +166,8 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "[si x] Step x (default 1)",cmd_si},
   { "info","[info r/w] r - reg info , w - watchpoint info",cmd_info},
-  { "x", "[x N expr] read N*4 Bytes at expr",cmd_x},
+  { "x", "[x N expr] read N*4 continius Bytes at expr in memory",cmd_x},
+  { "p", "[p expr] cal the expr",cmd_p},
   { "w", "[w expr] set a watchpoint when expr changes",cmd_w},
   { "d", "[d num] delete no.num watchpoint",cmd_d}
 
