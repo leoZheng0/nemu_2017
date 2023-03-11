@@ -153,7 +153,15 @@ static int cmd_d(char* args){
 
 //计算表达式
 static int cmd_p(char* args){
-  
+  char* expr_str = args;
+  TEST_VALID(expr_str==NULL);
+
+  bool success = true;
+  int val = expr(expr_str,&success);
+  TEST_VALID(!success);
+
+  printf("%s:\t%d\n",expr_str,val);
+  return 0;
 }
 
 static struct {
