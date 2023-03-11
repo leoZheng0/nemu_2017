@@ -59,3 +59,17 @@ void print_w() {
 		h = h -> next;
 	}
 }
+
+void check_wp(bool* stop) {
+	WP* h = head;
+	while (h != NULL) {
+		bool tmp = true;
+		uint32_t cur_val = expr(h->exprs, &tmp);
+		if (cur_val != h -> val) {
+			printf("[Watchpoint NO.%d]\tExpression: %s\tOrigin Value: %d\tNew Value: %d\n", h -> NO, h -> exprs, h -> val, cur_val);
+			h -> val = cur_val;
+			*stop = true;
+		}
+		h = h -> next;
+	}
+}
