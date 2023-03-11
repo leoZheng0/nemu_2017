@@ -130,6 +130,28 @@ static int cmd_w(char* args){
 	return 0;
 }
 
+//delete watchpoint
+static int cmd_d(char* args){
+  char* expr_str = args;
+  TEST_VALID(expr_str==NULL);
+
+  bool success = true;
+  int val = expr(expr_str,&success);
+  TEST_VALID(!success);
+
+  bool find = true;
+  WP* tar = get_wp(val,&find);
+  if (!find) {
+		printf("Cannot Find!\n");
+		return 0;
+	}
+
+  free_wp(tar);
+  printf("delete watchpoint NO.%d\n", val);
+	return 0;
+}
+
+
 static struct {
   char *name;
   char *description;
@@ -141,7 +163,8 @@ static struct {
   { "si", "[si x] Step x (default 1)",cmd_si},
   { "info","[info r/w] r - reg info , w - watchpoint info",cmd_info},
   { "x", "[x N expr] read N*4 Bytes at expr",cmd_x},
-  { "w", "[w expr] set a watchpoint when expr changes",cmd_w}
+  { "w", "[w expr] set a watchpoint when expr changes",cmd_w},
+  { "d", "[d num] delete no.num watchpoint",cmd_d}
 
   /* TODO: Add more commands */
 

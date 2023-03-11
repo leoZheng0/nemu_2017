@@ -73,3 +73,13 @@ void check_wp(bool* stop) {
 		h = h -> next;
 	}
 }
+
+//根据no 获得wp
+WP* get_wp(int no,bool *find){
+  WP* ret = head;
+	while (ret != NULL && ret -> NO != no) {
+		ret = ret -> next;
+	}
+	if (ret == NULL) *find = false;
+	return ret;
+}
