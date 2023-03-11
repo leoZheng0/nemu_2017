@@ -121,7 +121,7 @@ static int cmd_w(char* args){
 	}
   strcpy(wp -> exprs, expr_str);
   bool success = true;
-  wp->val = expr(expr_str,success);
+  wp->val = expr(expr_str,&success);
   printf("add watchpoint NO.%d\n", wp -> NO);
 	return 0;
 }
