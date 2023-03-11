@@ -51,3 +51,11 @@ void free_wp(WP *wp){
   wp->next = free_;
   free_ = wp;
 }
+
+void print_w() {
+	WP *h = head;
+	while (h != NULL) {
+		printf("[Watchpoint NO.%d]\tExpression: %s\tValue: %d\n", h -> NO, h -> exprs, h -> val);
+		h = h -> next;
+	}
+}

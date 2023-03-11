@@ -77,6 +77,7 @@ static int cmd_info(char *args){
     }
     case 'w':{
       //print watchpoint info
+      print_w();
       break;
     }
     default:{
