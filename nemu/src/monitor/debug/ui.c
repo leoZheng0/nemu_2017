@@ -107,6 +107,25 @@ static int cmd_x(char *args){
 	return 0;
 
 }
+
+//watchpoint
+static int cmd_w(char* args){
+
+  char* expr_str = args + strlen(args) + 1;
+  TEST_VALID(expr_str==NULL);
+
+  WP *wp = new_wp();
+  if (wp == NULL) {
+		printf("watchpoint pool is fully used!");
+		return 0;
+	}
+  strcpy(wp -> exprs, expr_str);
+  bool success = true;
+  wp->val = expr(expr_str,success);
+  printf("add watchpoint NO.%d\n", wp -> NO);
+	return 0;
+}
+
 static struct {
   char *name;
   char *description;
@@ -117,7 +136,8 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "[si x] Step x (default 1)",cmd_si},
   { "info","[info r/w] r - reg info , w - watchpoint info",cmd_info},
-  { "x", "[x N expr] read N*4 Bytes at expr",cmd_x}
+  { "x", "[x N expr] read N*4 Bytes at expr",cmd_x},
+  { "w", "[w expr] set a watchpoint when expr changes",cmd_w}
 
   /* TODO: Add more commands */
 
