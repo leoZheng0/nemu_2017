@@ -111,7 +111,7 @@ static int cmd_x(char *args){
 //watchpoint
 static int cmd_w(char* args){
 
-  char* expr_str = args + strlen(args) + 1;
+  char* expr_str = args;
   TEST_VALID(expr_str==NULL);
 
   WP *wp = new_wp();
