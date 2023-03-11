@@ -114,14 +114,17 @@ static int cmd_w(char* args){
   char* expr_str = args;
   TEST_VALID(expr_str==NULL);
 
+  bool success = true;
+  int val = expr(expr_str,&success);
+  TEST_VALID(!success);
   WP *wp = new_wp();
   if (wp == NULL) {
 		printf("watchpoint pool is fully used!");
 		return 0;
 	}
   strcpy(wp -> exprs, expr_str);
-  bool success = true;
-  wp->val = expr(expr_str,&success);
+
+  wp->val = val;
   printf("add watchpoint NO.%d\n", wp -> NO);
 	return 0;
 }
