@@ -170,7 +170,7 @@ static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 }
 
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
-  cpu.flags.ZF = ((*result & (0xFFFFFFFF >> ((4 - width) * 8))) == 0);\
+  cpu.flags.ZF = ((*result & (0xFFFFFFFF >> ((4 - width) * 8))) == 0);
 }
 
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
