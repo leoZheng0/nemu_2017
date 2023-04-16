@@ -96,6 +96,8 @@ make_DHelper(mov_G2E);
 make_DHelper(mov_E2G);
 make_DHelper(lea_M2G);
 
+make_DHelper(call_SI);
+
 make_DHelper(gp2_1_E);
 make_DHelper(gp2_cl2E);
 make_DHelper(gp2_Ib2E);
@@ -105,7 +107,9 @@ make_DHelper(a2O);
 
 make_DHelper(J);
 
-make_DHelper(push_SI);
+make_DHelper(push_I);
+make_DHelper(push_r);
+make_DHelper(pop_r);
 
 make_DHelper(in_I2a);
 make_DHelper(in_dx2a);

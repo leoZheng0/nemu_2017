@@ -5,7 +5,6 @@
 
 extern uint8_t pmem[];
 
-//都是以pmem为基址进行操作
 /* convert the guest physical address in the guest program to host virtual address in NEMU */
 #define guest_to_host(p) ((void *)(pmem + (unsigned)p))
 /* convert the host virtual address in NEMU to guest physical address in the guest program */

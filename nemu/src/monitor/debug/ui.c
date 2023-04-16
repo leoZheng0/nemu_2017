@@ -7,10 +7,15 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#define TEST_VALID(x) if(x){printf("Invalid args!\n");return 0;}
+extern CPU_state cpu;
+
+uint32_t expr(char *e, bool *success);
+
+void create_wp(char* expr, int val);
+void remove_wp(int NO);
+void print_wp();
 
 void cpu_exec(uint64_t);
-
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 char* rl_gets() {
@@ -21,9 +26,9 @@ char* rl_gets() {
     line_read = NULL;
   }
 
-  line_read = readline("(nemu) ");//等待指令
+  line_read = readline("(nemu) ");
 
-  if (line_read && *line_read) {//如果用户输入了什么,就将指令放到"history"链表的末尾
+  if (line_read && *line_read) {
     add_history(line_read);
   }
 
@@ -39,130 +44,156 @@ static int cmd_q(char *args) {
   return -1;
 }
 
-static int cmd_help(char *args);
-
-//单步执行
-static int cmd_si(char *args){
+static int cmd_si(char *args) {
   char *arg = strtok(NULL, " ");
-  int step;
-  if(arg == NULL){
-    step = 1;
+  int i;
+
+  if (arg == NULL) {
+    cpu_exec(1);
   }
-  else{
-    sscanf(arg,"%d",&step);
-    if(step<=0){
-      printf("you can't exec %d step(s), require >= 1 step(s)!\n",step);
+  else {
+    i = atoi(args);
+    if(i < 0) {
+        printf("Exception: Unexpected instruction count \'%s\'.\n", arg);
+    }
+    else
+        cpu_exec(i);
+  }
+  return 0;
+}
+
+static int cmd_info(char *args) {
+  char *arg = strtok(NULL, " ");
+  int i;
+
+  if (arg == NULL) {
+    printf("Exception: Subcommand SUBCMD is required.\n");
+  }
+  else {
+    if (strcmp(arg, "r") == 0) {
+      for (i = 0; i < 8; i++) {
+        printf("%s: 0x%08X\n", reg_name(i, 4), reg_l(i));
+      }
+      printf("eip: 0x%08X\n", cpu.eip);
+    }
+    else if (strcmp(arg, "w") == 0) {
+      print_wp();
+    }
+    else {
+      printf("Exception: Unknown subcommand \'%s\'.\n", arg);
+    }
+  }
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  uint32_t i;
+  bool success;
+
+
+  if (args == NULL) {
+    printf("Exception: Expression field EXPR is required.\n");
+  }
+  else {
+    i = expr(args, &success);
+    if (success)
+      printf("Result = %d\n       = 0x%08X\n", i, i);
+  }
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  char *arg = strtok(NULL, " ");
+  uint32_t N;
+  uint32_t Add;
+  char *exp = strtok(NULL, " ");  
+  bool success;
+  uint32_t MemContent;
+  bool IsFirst = true;
+  unsigned char ByteNow;
+
+  if (arg == NULL || exp == NULL) {
+    printf("Exception: Count field N and Expression field EXPR is required.\n");
+  }
+  else {
+    N = atoi(arg);
+    if (N <= 0)
+      printf("Exception: N must be greater than 0.\n");
+    else {
+      Add = expr(exp, &success);
+      if (!success)
+        printf("Exception: Unexpected address \'%s\'.\n", args + strlen(arg) + 1);
+      else {
+        printf("%d byte(s) of memory mapped from 0x%08X:\n\n", 4 * N, Add);
+        printf("            00 01 02 03 04 05 06 07\n\n");
+        while (N--) {
+          MemContent = vaddr_read(Add, 4);
+          if (IsFirst) {
+            printf("0x%08X  ", Add);
+          }
+          ByteNow = MemContent & 0xFF;
+          printf("%02X ", ByteNow);
+          MemContent = MemContent >> 8;
+          ByteNow = MemContent & 0xFF;
+          printf("%02X ", ByteNow);
+          MemContent = MemContent >> 8;
+          ByteNow = MemContent & 0xFF;
+          printf("%02X ", ByteNow);
+          MemContent = MemContent >> 8;
+          ByteNow = MemContent & 0xFF;
+          printf("%02X ", ByteNow);
+          if (!IsFirst)
+              printf("\n");
+          IsFirst = !IsFirst;
+          Add += 4;
+        }
+      }
+      if (!IsFirst)
+        printf("\n");
+    }
+  }
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  bool success;
+  int val;
+
+  if (args == NULL) {
+    printf("Exception: Expression field EXPR is required.\n");
+  }
+  else {
+    // Execute the expression to check if there are any mistakes in the expression
+    if (strlen(args) > 32 * 16) {
+      printf("Exception: Expression too long.\n");
       return 0;
     }
-  }
-  cpu_exec(step);
-  return 0;
-}
-
-//info
-static int cmd_info(char *args){
-
-  char *arg = strtok(NULL, " ");
-  TEST_VALID(arg==NULL);
-
-  switch(*arg){
-    case 'r':{
-      //print reg info
-      int i;
-      for (i = R_EAX; i <= R_EDI; i ++) {
-        printf("$%s\t:0x%08x\n",regsl[i],reg_l(i));
-      }
-      printf("$eip\t:0x%08x\n",cpu.eip);
-      break;
+    val = expr(args, &success);
+    
+    if (!success) {
+      printf("Exception: Watchpoint not set due to error(s) in your expression.\n");
+      return 0;
     }
-    case 'w':{
-      //print watchpoint info
-      print_w();
-      break;
-    }
-    default:{
-      printf("Unknown arg '%s'\n", arg);
-      break;
-    }
+    create_wp(args, val);
   }
   return 0;
 }
 
-//scan mem
-static int cmd_x(char *args){
-
+static int cmd_d(char *args) {
   char *arg = strtok(NULL, " ");
-  TEST_VALID(arg==NULL);
-  int N = atoi(arg);
+  int i;
 
-  char* expr_str = arg + strlen(arg) + 1;
-  TEST_VALID(expr_str==NULL);
-
-  //这里expr应该返回一个uint32类型的数值,因为地址一定为正
-  bool success;
-  uint32_t base = expr(expr_str,&success);
-  TEST_VALID(!success);
-	for (int i = 0; i < N; i++) {
-		printf("0x%08x\t0x%08x\n", base + i * 4, vaddr_read(base + i * 4, 4));
-	}
-	return 0;
-
-}
-
-//watchpoint
-static int cmd_w(char* args){
-
-  char* expr_str = args;
-  TEST_VALID(expr_str==NULL);
-
-  bool success = true;
-  int val = expr(expr_str,&success);
-  TEST_VALID(!success);
-  WP *wp = new_wp();
-  if (wp == NULL) {
-		printf("watchpoint pool is fully used!");
-		return 0;
-	}
-  strcpy(wp -> exprs, expr_str);
-
-  wp->val = val;
-  printf("add watchpoint NO.%d\n", wp -> NO);
-	return 0;
-}
-
-//delete watchpoint
-static int cmd_d(char* args){
-  char* expr_str = args;
-  TEST_VALID(expr_str==NULL);
-
-  bool success = true;
-  int val = expr(expr_str,&success);
-  TEST_VALID(!success);
-
-  bool find = true;
-  WP* tar = get_wp(val,&find);
-  if (!find) {
-		printf("Cannot Find!\n");
-		return 0;
-	}
-
-  free_wp(tar);
-  printf("delete watchpoint NO.%d\n", val);
-	return 0;
-}
-
-//计算表达式
-static int cmd_p(char* args){
-  char* expr_str = args;
-  TEST_VALID(expr_str==NULL);
-
-  bool success = true;
-  int val = expr(expr_str,&success);
-  TEST_VALID(!success);
-
-  printf("%s:\t%d\n",expr_str,val);
+  if (arg == NULL) {
+    printf("Exception: Field N is required.\n");
+  }
+  else {
+    i = atoi(args);
+    remove_wp(i);
+  }
   return 0;
 }
+
+static int cmd_help(char *args);
 
 static struct {
   char *name;
@@ -172,15 +203,12 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "[si x] Step x (default 1)",cmd_si},
-  { "info","[info r/w] r - reg info , w - watchpoint info",cmd_info},
-  { "x", "[x N expr] read N*4 continius Bytes at expr in memory",cmd_x},
-  { "p", "[p expr] cal the expr",cmd_p},
-  { "w", "[w expr] set a watchpoint when expr changes",cmd_w},
-  { "d", "[d num] delete no.num watchpoint",cmd_d}
-
-  /* TODO: Add more commands */
-
+  { "si", "N - Step in for N steps", cmd_si },
+  { "info", "SUBCMD - Provide program status. SUBCMD = r or w", cmd_info },
+  { "p", "EXPR - Evaluate expression", cmd_p },
+  { "x", "N EXPR - Output 4N bytes from the address evaluated form EXPR", cmd_x },
+  { "w", "EXPR - Set a watchpoint at the address evaluated from EXPR", cmd_w },
+  { "d", "N - Delete the watchpoint numbered N", cmd_d }
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
@@ -215,7 +243,7 @@ void ui_mainloop(int is_batch_mode) {
   }
 
   while (1) {
-    char *str = rl_gets();//这一步是让用户输入命令并保存到history中
+    char *str = rl_gets();
     char *str_end = str + strlen(str);
 
     /* extract the first token as the command */
@@ -225,7 +253,7 @@ void ui_mainloop(int is_batch_mode) {
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;//这个args就是除了第一个字符串之后的剩余字符串首指针(不去除首空格)
+    char *args = cmd + strlen(cmd) + 1;
     if (args >= str_end) {
       args = NULL;
     }
@@ -237,8 +265,8 @@ void ui_mainloop(int is_batch_mode) {
 
     int i;
     for (i = 0; i < NR_CMD; i ++) {
-      if (strcmp(cmd, cmd_table[i].name) == 0) {//这里开始比较cmd_table中的预设命令和我们输入的命令了
-        if (cmd_table[i].handler(args) < 0) { return; }//如果匹配,就会调用那个命令对应的handler函数
+      if (strcmp(cmd, cmd_table[i].name) == 0) {
+        if (cmd_table[i].handler(args) < 0) { return; }
         break;
       }
     }

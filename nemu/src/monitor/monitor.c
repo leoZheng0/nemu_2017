@@ -1,7 +1,7 @@
 #include "nemu.h"
 #include <unistd.h>
 
-#define ENTRY_START 0x100000//这是初始程序起始加载位置
+#define ENTRY_START 0x100000
 
 void init_difftest();
 void init_regex();
@@ -82,7 +82,9 @@ static inline void load_img() {
 static inline void restart() {
   /* Set the initial instruction pointer. */
   cpu.eip = ENTRY_START;
-
+  
+  cpu.eflags = 0x00000002;
+  
 #ifdef DIFF_TEST
   init_qemu_reg();
 #endif
@@ -92,8 +94,8 @@ static inline void parse_args(int argc, char *argv[]) {
   int o;
   while ( (o = getopt(argc, argv, "-bl:")) != -1) {
     switch (o) {
-      case 'b': is_batch_mode = true; break;//如果输入参数是b就启动batch_mode
-      case 'l': log_file = optarg; break;//指定文件输出路径,其中这个optarg表示getopt解析出来的文件路径,也就是我们要把输出log重定向至这里面
+      case 'b': is_batch_mode = true; break;
+      case 'l': log_file = optarg; break;
       case 1:
                 if (img_file != NULL) Log("too much argument '%s', ignored", optarg);
                 else img_file = optarg;

@@ -29,11 +29,11 @@ static inline make_DopHelper(I) {
 /* sign immediate */
 static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
+
   op->type = OP_TYPE_IMM;
-  
+
   op->simm = instr_fetch(eip, op->width);
-  op->simm = ((op->simm << (8 * (4 - op->width))) >> (8 * (4 - op->width)));
-  
+
   rtl_li(&op->val, op->simm);
 
 #ifdef DEBUG
@@ -155,6 +155,11 @@ make_DHelper(mov_I2E) {
   decode_op_I(eip, id_src, true);
 }
 
+make_DHelper(call_SI) {
+  decode_op_SI(eip, id_dest, false);
+  // the target address can be computed in the decode stage
+  decoding.jmp_eip = id_dest->simm + *eip;
+}
 
 /* XX <- Ib
  * eXX <- Iv
@@ -174,22 +179,12 @@ make_DHelper(I) {
   decode_op_I(eip, id_dest, true);
 }
 
-make_DHelper(SI) {
-  decode_op_SI(eip, id_dest, true);
-}
-
 make_DHelper(r) {
   decode_op_r(eip, id_dest, true);
 }
 
 make_DHelper(E) {
   decode_op_rm(eip, id_dest, true, NULL, false);
-}
-
-make_DHelper(J_gp5) {
-  // for use with call r/m
-  // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->val;
 }
 
 make_DHelper(gp7_E) {
@@ -269,6 +264,18 @@ make_DHelper(J) {
   decode_op_SI(eip, id_dest, false);
   // the target address can be computed in the decode stage
   decoding.jmp_eip = id_dest->simm + *eip;
+}
+
+make_DHelper(push_I) {
+  decode_op_I(eip, id_dest, true);
+}
+
+make_DHelper(push_r) {
+  decode_op_r(eip, id_dest, true);
+}
+
+make_DHelper(pop_r) {
+  decode_op_r(eip, id_dest, false);
 }
 
 make_DHelper(in_I2a) {
