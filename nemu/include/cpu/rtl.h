@@ -49,7 +49,7 @@ static inline void rtl_ror(rtlreg_t* dest, const rtlreg_t* src1, const rtlreg_t*
   uint32_t partup = ((*src1 & ((((uint32_t)(0xFFFFFFFF) >> (32 - width * 8)) >> (src2eff)) << src2eff)) >> (src2eff));
   *dest = partlow | partup;
 }
-
+//
 static inline void rtl_rol(rtlreg_t* dest, const rtlreg_t* src1, const rtlreg_t* src2, int width) {
   uint32_t src2eff = *src2 % (width * 8);
   uint32_t partlow = ((*src1 & (((uint32_t)(0xFFFFFFFF) >> (32 - width * 8)) >> src2eff)) << (src2eff));
